@@ -76,6 +76,16 @@ function parseSnippet(snippet: String) {
     throw new Error("Header content not found");
   }
 }
+/*
+Type in A1:
+/begin PROJECT A211 "MDG1"
+  /begin HEADER ""
+    VERSION    "C914"
+    PROJECT_NO A211
+  /end HEADER
+  
+*/
+
 
 export async function parse() {
   try {
@@ -87,6 +97,19 @@ export async function parse() {
       console.log(headerRange.values);
       const parsedData = parseSnippet(headerRange.values[0][0]);
       console.log(parsedData);
+      // Start writing from cell B2
+      let startRow = 2; // B2 means row 2, column B
+      const startColumn = "B";
+
+      // Iterate over the parsedData object
+      for (const [key, value] of Object.entries(parsedData)) {
+        // Set the key in the current row, column B
+        sheet.getRange(`${startColumn}${startRow}`).values = [[key]];
+        // Set the value in the current row, column C
+        sheet.getRange(`${String.fromCharCode(startColumn.charCodeAt(0) + 1)}${startRow}`).values = [[value]];
+        // Move to the next row
+        startRow++;
+      }
       //await context.sync();
     });
   } catch (error) {
