@@ -9,7 +9,7 @@ Office.onReady((info) => {
   if (info.host === Office.HostType.Excel) {
     document.getElementById("sideload-msg").style.display = "none";
     document.getElementById("app-body").style.display = "flex";
-    document.getElementById("run").onclick = run;
+    document.getElementById("run").onclick = parse;
   }
 });
 
@@ -50,5 +50,46 @@ export async function run() {
     });
   } catch (error) {
     console.error(error);
+  }
+}
+
+// Function to parse the snippet
+function parseSnippet(snippet: String) {
+  // Define a regular expression to match the content between /begin HEADER and /end HEADER
+  const headerRegex = /\/begin HEADER.*?\n([\s\S]*?)\/end HEADER/m;
+  const match = snippet.match(headerRegex);
+
+  if (match && match[1]) {
+    const content = match[1].trim();
+    const lines = content.split("\n");
+    const parsedData = {};
+
+    lines.forEach((line) => {
+      // Split each line by whitespace to get key and value
+      const [key, ...valueParts] = line.trim().split(/\s+/);
+      const value = valueParts.join(" ");
+      parsedData[key] = value.replace(/"/g, ""); // Remove quotes from values if any
+    });
+
+    return parsedData;
+  } else {
+    throw new Error("Header content not found");
+  }
+}
+
+export async function parse() {
+  try {
+    await Excel.run(async (context) => {
+      let sheet = context.workbook.worksheets.getActiveWorksheet();
+      let headerRange = sheet.getRange("A1");
+      headerRange.load("values");
+      await context.sync();
+      console.log(headerRange.values);
+      const parsedData = parseSnippet(headerRange.values[0][0]);
+      console.log(parsedData);
+      //await context.sync();
+    });
+  } catch (error) {
+    console.error(error.message);
   }
 }
