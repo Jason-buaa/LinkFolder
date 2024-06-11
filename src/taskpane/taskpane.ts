@@ -110,7 +110,8 @@ export async function parse() {
         // Move to the next row
         startRow++;
       }
-      //await context.sync();
+      // https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object/entries
+      await context.sync();
     });
   } catch (error) {
     console.error(error.message);
