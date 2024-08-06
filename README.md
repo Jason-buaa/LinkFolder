@@ -6,7 +6,12 @@ How to use this repo?
 
 3. Navigate to the root folder of this repo.
 
-4. Install the required modules with command :
+4. Use git command to checkout the desired commit.
+```
+git checkout da2d4bd
+```
+
+6. Install the required modules with command :
 ```
 npm install
 ```
